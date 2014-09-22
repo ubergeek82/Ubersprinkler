@@ -46,7 +46,7 @@ StationController controller(STATION1, STATION2, STATION3, STATION4);
 char compiledDateTime[22] = COMPILED_DATE;
 int stationStatus = 0;
 int duration=10;
-char* dateTime;
+int timeHour;
 int signalStrength;
 int cycleTimeSec = 600;
 int currentStation = 1;
@@ -61,7 +61,7 @@ void setup() {
     
     
     Spark.variable("compiled", &compiledDateTime, STRING);
-    Spark.variable("time", dateTime, STRING);
+    Spark.variable("time", &timeHour, INT);
     Spark.variable("signal", &signalStrength, INT);
     Spark.variable("station", &stationStatus, INT);
     Spark.function("station", toggleStation);
@@ -81,15 +81,15 @@ void syncTime(){
 }
 
 void loop() {
-//    stationStatus=controller.getStatus();
-//    Serial.println(stationStatus);
+    stationStatus=controller.getStatus();
+    Serial.println(stationStatus);
 
-    dateTime = strcpy(dateTime, Time.hour() + ":" + Time.minute());
+    timeHour = Time.hour();
     // uint32_t  currentTime = Time.now();
     // String dateTime = rtc.ISODateUTCString(currentTime);
 
     signalStrength = WiFi.RSSI();
-//    Serial.println(Time.timeStr());
+    Serial.println(Time.timeStr());
     delay(1000);
 }
 
@@ -118,10 +118,13 @@ int cycleAPI(String args){
 }
 
 void runCycle(int cycleTimeSec){
+    Serial.print("runCycle()");
     for(int i=1; i<5;i++){
         String stationStr = String(i);
         controller.toggleStation(stationStr + ",on");
+        Serial.println("runcycle(): Delay Start");
         delay(cycleTimeSec);
+        Serial.println("runcycle(): Delay END");
         controller.toggleStation("all,off");
     }
 }
