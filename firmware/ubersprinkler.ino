@@ -66,11 +66,14 @@ void setup() {
     Spark.variable("station", &stationStatus, INT);
     Spark.function("station", toggleStation);
     Spark.function("cycle", cycleAPI);
+	Spark.function("settime",setTime);
 
     Time.zone(-7);
     //Daily sync time with cloud @ 1AM
     Alarm.alarmRepeat(1,00,0, syncTime);
-
+	
+	loadProgram();
+	
     // Schedule schedule(initializeDefaultSchedule());  
 }
 
@@ -78,6 +81,11 @@ void syncTime(){
     Spark.syncTime();
     Serial.println("Alarm: - Syncing time with Spark Cloud");  
 
+}
+
+int setTime(String arg){
+	Time.setTime(1411480790); // set time to Tuesday 6:59:00am Sept 23 2014
+	return 1;
 }
 
 void loop() {
@@ -88,6 +96,7 @@ void loop() {
     // uint32_t  currentTime = Time.now();
     // String dateTime = rtc.ISODateUTCString(currentTime);
 
+	Alarm.delay(1000);
     signalStrength = WiFi.RSSI();
     Serial.println(Time.timeStr());
     delay(1000);
@@ -104,6 +113,7 @@ void loadProgram(){
 }
 
 void cycleAlarm(){
+	Serial.print("cycleAlarm()");
     //check manual/auto
     //check rain delay
     
