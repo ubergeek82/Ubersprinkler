@@ -24,16 +24,12 @@ int StationController::toggleStation(String arg){
     93 = STATION3 OFF
     94 = STATION4 OFf
     ================================*/
-    Serial.println(arg);
     int commaIndex = arg.indexOf(',');
 
     arg.toUpperCase();
     String firstArg = arg.substring(0,commaIndex);
     String secondArg = arg.substring(commaIndex+1);
-    
-    Serial.println(firstArg);
-    Serial.println(secondArg);
-    
+	
     if (firstArg == "ALL"){
         return toggleAllStations(secondArg);
     }
