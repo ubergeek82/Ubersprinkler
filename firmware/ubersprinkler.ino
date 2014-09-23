@@ -48,7 +48,6 @@ int ALARM_CYCLE_TIME = 600;
 char compiledDateTime[22] = COMPILED_DATE;
 int stationStatus = 0;
 int duration=10;
-int timeHour;
 int signalStrength;
 int cycleTimeSec = 600;
 int currentStation;
@@ -64,12 +63,12 @@ void setup() {
     strcat(compiledDateTime, COMPILED_TIME);
     
     Spark.variable("compiled", &compiledDateTime, STRING);
-    Spark.variable("time", &timeHour, INT);
     Spark.variable("signal", &signalStrength, INT);
     Spark.variable("station", &stationStatus, INT);
     Spark.function("station", toggleStation);
     Spark.function("cycle", cycleAPI);
 	Spark.function("alarmTime",setAlarmTime);
+	Spark.function("time", setTime);
 
     Time.zone(-7);
     //Daily sync time with cloud @ 1AM
@@ -89,7 +88,8 @@ void syncTime(){
 }
 
 int setTime(String arg){
-	Time.setTime(1411480790); // set time to Tuesday 6:59:00am Sept 23 2014
+	Serial.println("setTime(): " + arg + " seconds");
+	Time.setTime(arg.toInt()); // set time to Tuesday 6:59:00am Sept 23 2014, 1411480790
 	return 1;
 }
 
@@ -100,7 +100,20 @@ void loop() {
     Serial.println(Time.timeStr());
    
 	if(isRunning){
-		runCycle();
+		Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
+		if(Time.now() > runTimer){
+			Serial.println("Turning off sprinklers");
+			controller.toggleStation("all,off");
+			if(currentStation < 4 && currentStation > 0){
+				currentStation++;
+				runTimer = Time.now() + cycleTimeSec;
+				controller.toggleStation(String(currentStation) + ",on");
+			}else{ //last station reached
+				Serial.println("Last Station reached, all sprinklers off");
+				currentStation = 1;
+				isRunning = false;
+			}
+		}
 	}
 	
 	Alarm.delay(1000);
@@ -148,20 +161,7 @@ void startCycle(int cycleTimeSec){
 }
 
 void runCycle(){
-	Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
-	if(Time.now() > runTimer){
-		Serial.println("Turning off sprinklers");
-		controller.toggleStation("all,off");
-		if(currentStation < 4 && currentStation > 0){
-			currentStation++;
-			runTimer = Time.now() + cycleTimeSec;
-			controller.toggleStation(String(currentStation) + ",on");
-		}else{ //last station reached
-			Serial.println("Last Station reached, all sprinklers off");
-			currentStation = 1;
-			isRunning = false;
-		}
-	}
+
 }
 
 void cancelCycle(){
