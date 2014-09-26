@@ -6,6 +6,7 @@
 
 // This #include statement was automatically added by the Spark IDE.
 #include "TimeAlarms.h"
+
 #undef now()
 
 #include <application.h>
@@ -51,14 +52,15 @@ int duration=10;
 int signalStrength;
 int cycleTimeSec = 600;
 int currentStation;
-uint8_t isRunning;
+uint8_t isRunning = false;
 unsigned long int runTimer;
 
 void setup() {
     if(debug){
         Serial.begin(9600);
     }
-
+	
+	Serial.println("Setting up UberCore");
     strcat(compiledDateTime, " - ");
     strcat(compiledDateTime, COMPILED_TIME);
     
@@ -73,13 +75,10 @@ void setup() {
     Time.zone(-7);
     //Daily sync time with cloud @ 1AM
     Alarm.alarmRepeat(1,00,0, syncTime);
-	
-	isRunning = false;
-	
+
 	Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm); 
     Alarm.alarmRepeat(dowThursday,7,00,00,cycleAlarm); 
-    Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm); 
-	
+    Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm);
 }
 
 void syncTime(){
@@ -165,6 +164,7 @@ void runCycle(){
 }
 
 void cancelCycle(){
+    Serial.println("cancelCycle()");
 	controller.toggleStation("all,off");
 	isRunning = false;
 	currentStation = 0;
