@@ -1,4 +1,5 @@
-#include "StationController.h"
+#include "Stationstation.h"
+//#include "Weatherstation.h"
 #include "TimeAlarms.h"
 
 #undef now()
@@ -37,7 +38,8 @@ public:
 
 RunBeforeSetup runBeforeSetup;
 
-StationController controller(STATION1, STATION2, STATION3, STATION4);
+StationController station(STATION1, STATION2, STATION3, STATION4);
+//WeatherController weather();
 
 int ALARM_CYCLE_TIME = 600;
 char compiledDateTime[22] = COMPILED_DATE;
@@ -78,7 +80,7 @@ void setup() {
 }
 
 void loop() {
-    stationStatus=controller.getStatus();
+    stationStatus=station.getStatus();
     Serial.println("stationStatus = " + String(stationStatus));
     signalStrength = WiFi.RSSI();
     Serial.println(Time.timeStr());
@@ -87,11 +89,11 @@ void loop() {
 		Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
 		if(Time.now() > runTimer){
 			Serial.println("Turning off sprinklers");
-			controller.toggleStation("all,off");
+			station.toggleStation("all,off");
 			if(currentStation < 4 && currentStation > 0){
 				currentStation++;
 				runTimer = Time.now() + cycleTimeSec;
-				controller.toggleStation(String(currentStation) + ",on");
+				station.toggleStation(String(currentStation) + ",on");
 			}else{ //last station reached
 				Serial.println("Last Station reached, all sprinklers off");
 				currentStation = 1;
@@ -115,7 +117,7 @@ int setTime(String arg){
 }
 
 int toggleStation(String arg){
-    return controller.toggleStation(arg);
+    return station.toggleStation(arg);
 }
 
 void cycleAlarm(){
@@ -151,7 +153,7 @@ void startCycle(int cycleTimeSec){
 	runTimer = Time.now() + cycleTimeSec;
 	Serial.println(Time.now());
 	Serial.println(runTimer);
-	controller.toggleStation("1,on");
+	station.toggleStation("1,on");
 	currentStation = 1;
 }
 
@@ -163,7 +165,7 @@ bool checkWeather(){
 
 void cancelCycle(){
     Serial.println("cancelCycle()");
-	controller.toggleStation("all,off");
+	station.toggleStation("all,off");
 	isRunning = false;
 	currentStation = 0;
 }
