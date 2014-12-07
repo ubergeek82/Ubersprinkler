@@ -1,10 +1,4 @@
-// This #include statement was automatically added by the Spark IDE.
-//#include "SparkTime/SparkTime.h"
-
-// This #include statement was automatically added by the Spark IDE.
 #include "StationController.h"
-
-// This #include statement was automatically added by the Spark IDE.
 #include "TimeAlarms.h"
 
 #undef now()
@@ -79,17 +73,8 @@ void setup() {
 	Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm); 
     Alarm.alarmRepeat(dowThursday,7,00,00,cycleAlarm); 
     Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm);
-}
 
-void syncTime(){
-    Spark.syncTime();
-    Serial.println("Alarm: - Syncing time with Spark Cloud");  
-}
-
-int setTime(String arg){
-	Serial.println("setTime(): " + arg + " seconds");
-	Time.setTime(arg.toInt()); // set time to Tuesday 6:59:00am Sept 23 2014, 1411480790
-	return 1;
+    cancelCycle();
 }
 
 void loop() {
@@ -116,6 +101,17 @@ void loop() {
 	}
 	
 	Alarm.delay(1000);
+}
+
+void syncTime(){
+    Spark.syncTime();
+    Serial.println("Alarm: - Syncing time with Spark Cloud");  
+}
+
+int setTime(String arg){
+	Serial.println("setTime(): " + arg + " seconds");
+	Time.setTime(arg.toInt()); // set time to Tuesday 6:59:00am Sept 23 2014, 1411480790
+	return 1;
 }
 
 int toggleStation(String arg){
@@ -159,8 +155,10 @@ void startCycle(int cycleTimeSec){
 	currentStation = 1;
 }
 
-void runCycle(){
-
+bool checkWeather(){
+	//check weather api for yesterday and tomorrow
+	//if it rained yesterday or will rain tomorrow - return false (don't water)
+	//if weather is clear - return true - (OK to water)
 }
 
 void cancelCycle(){
