@@ -25,7 +25,7 @@ update-dependencies: clean
 	cp -v tmp/HttpClient/firmware/{*.cpp,*.h} lib/
 	rm -r tmp/HttpClient
 
-	// https://github.com/ladyada/Adafruit_CharacterOLED
+	// https://github.com/ladyadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDda/Adafruit_CharacterOLED
 
 
 clean:

@@ -1,11 +1,5 @@
-// This #include statement was automatically added by the Spark IDE.
-//#include "SparkTime/SparkTime.h"
-
-// This #include statement was automatically added by the Spark IDE.
 #include "StationController.h"
-
-// This #include statement was automatically added by the Spark IDE.
-#include "TimeAlarms.h"
+ include "TimeAlarms.h"
 
 #undef now()
 
@@ -24,22 +18,33 @@ const uint8_t STATION4=D4;
 
 const bool debug = true;
 
-SYSTEM_MODE(AUTOMATIC); //SEMIAUTOMATIC = no cloud conection by default, need to call Spark.connect();
+SYSTEM_MODE(AUTOMATIC); //SEMIAUTOMATIC = no cloud connection by default, need to call Spark.connect();
 
 class RunBeforeSetup {
 public:
-	RunBeforeSetup() {
-	    pinMode(STATION1, OUTPUT);
-	    pinMode(STATION2, OUTPUT);
-	    pinMode(STATION3, OUTPUT);
-	    pinMode(STATION4, OUTPUT);
-	    
-	    digitalWrite(STATION1, OFF);
-	    digitalWrite(STATION2, OFF);
-	    digitalWrite(STATION3, OFF);
-	    digitalWrite(STATION4, OFF);
-	}
+		RunBeforeSetup() {
+				pinMode(STATION1, OUTPUT);
+				pinMode(STATION2, OUTPUT);
+				pinMode(STATION3, OUTPUT);
+				pinMode(STATION4, OUTPUT);
+
+				digitalWrite(STATION1, OFF);
+				digitalWrite(STATION2, OFF);
+				digitalWrite(STATION3, OFF);
+				digitalWrite(STATION4, OFF);
+		}
 };
+
+int doDFU(String ignoredParam) {
+
+		FLASH_OTA_Update_SysFlag = 0x0000;
+		Save_SystemFlags();
+		BKP_WriteBackupRegister(BKP_DR10, 0x0000);
+		USB_Cable_Config(DISABLE);
+		NVIC_SystemReset();
+
+		return 0;
+}
 
 RunBeforeSetup runBeforeSetup;
 
@@ -55,117 +60,116 @@ int currentStation;
 uint8_t isRunning = false;
 unsigned long int runTimer;
 
+
 void setup() {
     if(debug){
         Serial.begin(9600);
     }
-	
-	Serial.println("Setting up UberCore");
+
+		Serial.println("Setting up UberCore");
     strcat(compiledDateTime, " - ");
     strcat(compiledDateTime, COMPILED_TIME);
-    
+
     Spark.variable("compiled", &compiledDateTime, STRING);
     Spark.variable("signal", &signalStrength, INT);
     Spark.variable("station", &stationStatus, INT);
     Spark.function("station", toggleStation);
     Spark.function("cycle", cycleAPI);
-	Spark.function("alarmTime",setAlarmTime);
-	Spark.function("time", setTime);
+		Spark.function("alarmTime",setAlarmTime);
+		Spark.function("time", setTime);
+		Spark.function("dfu",doDFU);
 
     Time.zone(-7);
     //Daily sync time with cloud @ 1AM
     Alarm.alarmRepeat(1,00,0, syncTime);
 
-	Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm); 
-    Alarm.alarmRepeat(dowThursday,7,00,00,cycleAlarm); 
+		Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm);
+    Alarm.alarmRepeat(dowThursday,7,00,00,cycleAlarm);
     Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm);
+    controller.cancelCycle();
+
+}
+
+void loop() {
+		stationStatus=controller.getStatus();
+		Serial.println("stationStatus = " + String(stationStatus));
+		signalStrength = WiFi.RSSI();
+		Serial.println(Time.timeStr());
+
+		if(isRunning){
+		Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
+				if(Time.now() > runTimer){
+						Serial.println("Turning off sprinklers");
+						controller.toggleStation("all,off");
+						if(currentStation < 4 && currentStation > 0){
+								currentStation++;
+								runTimer = Time.now() + cycleTimeSec;
+								controller.toggleStation(String(currentStation) + ",on");
+						}else{ //last station reached
+								Serial.println("Last Station reached, all sprinklers off");
+								currentStation = 1;
+								isRunning = false;
+						}
+				}
+		}
+		Alarm.delay(1000);
 }
 
 void syncTime(){
     Spark.syncTime();
-    Serial.println("Alarm: - Syncing time with Spark Cloud");  
+    Serial.println("Alarm: - Syncing time with Spark Cloud");
 }
 
 int setTime(String arg){
-	Serial.println("setTime(): " + arg + " seconds");
-	Time.setTime(arg.toInt()); // set time to Tuesday 6:59:00am Sept 23 2014, 1411480790
-	return 1;
-}
-
-void loop() {
-    stationStatus=controller.getStatus();
-    Serial.println("stationStatus = " + String(stationStatus));
-    signalStrength = WiFi.RSSI();
-    Serial.println(Time.timeStr());
-   
-	if(isRunning){
-		Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
-		if(Time.now() > runTimer){
-			Serial.println("Turning off sprinklers");
-			controller.toggleStation("all,off");
-			if(currentStation < 4 && currentStation > 0){
-				currentStation++;
-				runTimer = Time.now() + cycleTimeSec;
-				controller.toggleStation(String(currentStation) + ",on");
-			}else{ //last station reached
-				Serial.println("Last Station reached, all sprinklers off");
-				currentStation = 1;
-				isRunning = false;
-			}
-		}
-	}
-	
-	Alarm.delay(1000);
+		Serial.println("setTime(): " + arg + " seconds");
+		Time.setTime(arg.toInt()); // set time to Tuesday 6:59:00am Sept 23 2014, 1411480790
+		return 1;
 }
 
 int toggleStation(String arg){
-    return controller.toggleStation(arg);
+  	return controller.toggleStation(arg);
 }
 
 void cycleAlarm(){
-	Serial.println("cycleAlarm()");
-    //check manual/auto
-    //check rain delay
-    
-    //turn on sprinklers
-    startCycle(ALARM_CYCLE_TIME);
+		Serial.println("cycleAlarm()");
+  	//check manual/auto
+  	//check rain delay
+
+  	//turn on sprinklers
+  	startCycle(ALARM_CYCLE_TIME);
 }
 
 int cycleAPI(String arg){
-	Serial.println("cycleAPI(): " + arg + " seconds");
-    cycleTimeSec = arg.toInt();
-    if(cycleTimeSec > 0){
-		startCycle(cycleTimeSec);
-		return 1;
-	}else{
-		cancelCycle();
-		return 0;
-	}
+		Serial.println("cycleAPI(): " + arg + " seconds");
+    	cycleTimeSec = arg.toInt();
+    	if(cycleTimeSec > 0){
+			startCycle(cycleTimeSec);
+			return 1;
+		}else{
+			cancelCycle();
+			return 0;
+		}
 }
 
 int setAlarmTime(String arg){
-	Serial.println("setAlarmTime(): " + arg + " seconds");
-    ALARM_CYCLE_TIME = arg.toInt();
-	return 1;
+		Serial.println("setAlarmTime(): " + arg + " seconds");
+  	ALARM_CYCLE_TIME = arg.toInt();
+		return 1;
 }
 
 void startCycle(int cycleTimeSec){
-    Serial.println("startCycle() - Station1 ON");
-	isRunning = true;
-	runTimer = Time.now() + cycleTimeSec;
-	Serial.println(Time.now());
-	Serial.println(runTimer);
-	controller.toggleStation("1,on");
-	currentStation = 1;
-}
-
-void runCycle(){
-
+  	Serial.println("startCycle() - Station1 ON");
+		isRunning = true;
+		runTimer = Time.now() + cycleTimeSec;
+		Serial.println(Time.now());
+		Serial.println(runTimer);
+		controller.toggleStation("1,on");
+		currentStation = 1;
 }
 
 void cancelCycle(){
-    Serial.println("cancelCycle()");
-	controller.toggleStation("all,off");
-	isRunning = false;
-	currentStation = 0;
+  	Serial.println("cancelCycle()");
+		controller.toggleStation("all,off");
+		isRunning = false;
+		currentStation = 0;
 }
