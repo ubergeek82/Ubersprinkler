@@ -41,7 +41,7 @@ public:
 RunBeforeSetup runBeforeSetup;
 
 StationController station(STATION1, STATION2, STATION3, STATION4);
-WeatherController weather(ZIPCODE);
+WeatherUnderground weather("c91fc57e9677bd22", ZIPCODE);
 
 int ALARM_CYCLE_TIME = 600;
 char compiledDateTime[22] = COMPILED_DATE;
@@ -129,7 +129,6 @@ int toggleStation(String arg){
 
 void cycleAlarm(){
 	Serial.println("cycleAlarm()");
-    
     //check weather
     if(!rainDelay()){
     	//turn on sprinklers

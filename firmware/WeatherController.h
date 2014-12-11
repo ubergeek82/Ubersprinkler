@@ -1,6 +1,8 @@
 #ifndef _WEATHERCTRL_H
 #define _WEATHERCTRL_H
 
+#include <application.h>
+
 typedef struct weather_yesterday_response_t {
 	int rain;
 	int rprecipm;
@@ -21,20 +23,21 @@ typedef struct weather_forecast_response_t {
 	
 	bool isSuccess;
 	// defaults:
-	weather_forecast_t(): qpf_today(-1), qpf_tomorrow(-1), isSuccess(false) {};
+	weather_forecast_response_t(): qpf_today(-1), qpf_tomorrow(-1), isSuccess(false) {};
 
 } weather_forecast_response_t;
 
 class WeatherController{
  
  public:
-    WeatherController(int zipCode);
+    WeatherController(String apiKey, int zipCode);
     void update();
     bool rainedYesterday;
     bool rainToday;
     bool rainTomorrow;
 
-  private:
+  protected:
+  	String apiKey;
   	int zipCode;
 };
 
