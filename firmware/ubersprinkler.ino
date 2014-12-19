@@ -24,7 +24,7 @@ const uint8_t STATION4=D4;
 
 const bool debug = true;
 
-SYSTEM_MODE(MANUAL); //SEMI_AUTOMATIC = no cloud conection by default, need to call Spark.connect();
+SYSTEM_MODE(AUTOMATIC);
 
 
 class RunBeforeSetup {
