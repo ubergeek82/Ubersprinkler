@@ -1,6 +1,8 @@
 #ifndef _STNCTL_H
 #define _STNCTL_H
 
+#include "application.h"
+
 class StationController{
  
  public:

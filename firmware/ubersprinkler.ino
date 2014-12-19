@@ -1,8 +1,11 @@
 #include "StationController.h"
 #include "WeatherController.h"
 #include "TimeAlarms.h"
+#include "WeatherUnderground.h"
 
 #undef now()
+#undef SPARK_WLAN_ENABLE
+
 
 #include <application.h>
 
@@ -21,7 +24,8 @@ const uint8_t STATION4=D4;
 
 const bool debug = true;
 
-SYSTEM_MODE(AUTOMATIC); //SEMIAUTOMATIC = no cloud conection by default, need to call Spark.connect();
+SYSTEM_MODE(MANUAL); //SEMI_AUTOMATIC = no cloud conection by default, need to call Spark.connect();
+
 
 class RunBeforeSetup {
 public:
@@ -41,7 +45,8 @@ public:
 RunBeforeSetup runBeforeSetup;
 
 StationController station(STATION1, STATION2, STATION3, STATION4);
-WeatherUnderground weather("c91fc57e9677bd22", ZIPCODE);
+HttpClient httpClient;
+WeatherUnderground weather(httpClient, ZIPCODE);
 
 int ALARM_CYCLE_TIME = 600;
 char compiledDateTime[22] = COMPILED_DATE;
@@ -76,7 +81,7 @@ void setup() {
     Alarm.alarmRepeat(1,00,0, syncTime);
 
     //Hourly weather updates
-    Alarm.alarmRepeat(3600,checkWeather);
+    Alarm.alarmRepeat(3600,checkWeatherHourly);
 
     //Watering Days
 	Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm); 
@@ -84,6 +89,9 @@ void setup() {
     Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm);
 
     cancelCycle();
+
+
+
 }
 
 void loop() {
@@ -130,11 +138,11 @@ int toggleStation(String arg){
 void cycleAlarm(){
 	Serial.println("cycleAlarm()");
     //check weather
-    if(!rainDelay()){
-    	//turn on sprinklers
-    	startCycle(ALARM_CYCLE_TIME);
+    if(isRaining()){
+    	//DO NOTHING
 	}else{
-		//DO NOTHING
+		//turn on sprinklers
+    	startCycle(ALARM_CYCLE_TIME);
 	}
 }
 
@@ -166,7 +174,7 @@ void startCycle(int cycleTimeSec){
 	currentStation = 1;
 }
 
-void checkWeather(){
+void checkWeatherHourly(){
 	//check weather api for yesterday, today, and tomorrow
 	if(weather.update()){
 		Serial.println("Weather Updated Successfully");
@@ -175,17 +183,14 @@ void checkWeather(){
 	}
 }
 
-bool rainDelay(){
+bool isRaining(){
 	//if it rained yesterday or will rain tomorrow - return true (don't water)
 	//if weather is clear - return false - (OK to water)
-	if(weather.rainedYesterday() || weather.rainToday() || weather.rainTomorrow()){
+	if(weather.wasRainYesterday() || weather.willRainToday() || weather.willRainTomorrow()){
 		return true;
 	}else{
 		return false;
 	}
-
-	//stubb - TODO: change this
-	return false;
 }
 
 void cancelCycle(){
