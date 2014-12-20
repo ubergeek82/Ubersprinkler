@@ -31,7 +31,7 @@ typedef struct weather_forecast_response_t {
 class WeatherUnderground : public WeatherController {
  
 public:
-	WeatherUnderground(HttpClient httpClient, int zipCode);
+	WeatherUnderground(HttpClient httpClient, int zipParam);
 	bool update();
 private:
 	ArduinoJson::Parser::JsonParser<70> parser; // occupies 70 * 4 bytes

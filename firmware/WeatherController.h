@@ -14,8 +14,8 @@ class WeatherController{
 
   protected:
   	http_request_t requestYesterday;
-	http_request_t requestForecast;
-	HttpClient client;
+    http_request_t requestForecast;
+    HttpClient client;
   	int zipCode;
   	bool rainedYesterday;
   	bool rainToday;

@@ -74,14 +74,15 @@ void setup() {
     Spark.function("station", toggleStation);
     Spark.function("cycle", cycleAPI);
 	Spark.function("alarmTime",setAlarmTime);
-	Spark.function("time", setTime);
+	// Spark.function("time", setTime);
+	Spark.function("weather", checkWeather);
 
     Time.zone(-7);
     //Daily sync time with cloud @ 1AM
-    Alarm.alarmRepeat(1,00,0, syncTime);
+    Alarm.alarmRepeat(1,00,00, syncTime);
 
     //Hourly weather updates
-    Alarm.alarmRepeat(3600,checkWeatherHourly);
+    Alarm.alarmRepeat(3600,checkWeatherAlarm);
 
     //Watering Days
 	Alarm.alarmRepeat(dowTuesday,7,00,00,cycleAlarm); 
@@ -164,6 +165,16 @@ int setAlarmTime(String arg){
 	return 1;
 }
 
+int checkWeather(String arg){
+	//check weather api for yesterday, today, and tomorrow
+	if(weather.update()){
+		Serial.println("Weather Updated Successfully");
+	}else{
+		Serial.println("Weather update failed!");
+	}
+	return 1;
+}
+
 void startCycle(int cycleTimeSec){
     Serial.println("startCycle() - Station1 ON");
 	isRunning = true;
@@ -174,13 +185,8 @@ void startCycle(int cycleTimeSec){
 	currentStation = 1;
 }
 
-void checkWeatherHourly(){
-	//check weather api for yesterday, today, and tomorrow
-	if(weather.update()){
-		Serial.println("Weather Updated Successfully");
-	}else{
-		Serial.println("Weather update failed!");
-	}
+void checkWeatherAlarm(){
+	checkWeather("Alarm");
 }
 
 bool isRaining(){

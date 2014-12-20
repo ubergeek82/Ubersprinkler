@@ -6,9 +6,9 @@
 
 #define MIN_RAINFALL_MM 4
 
-WeatherUnderground::WeatherUnderground(HttpClient httpClient, int zip){
+WeatherUnderground::WeatherUnderground(HttpClient httpClient, int zipParam){
     client = httpClient;
-    zipCode = zip;
+    zipCode = zipParam;
 }
 
 bool WeatherUnderground::update(){
@@ -40,7 +40,7 @@ bool WeatherUnderground::update(){
 weather_yesterday_response_t WeatherUnderground::getYesterday() {
     requestYesterday.hostname = "api.wunderground.com";
     requestYesterday.port = 80;
-    requestYesterday.path = "api/" + WUNDERGRND_KEY + "/yesterday/q/" + zipCode + ".json";
+    requestYesterday.path = "/api/" + WUNDERGRND_KEY + "/yesterday/q/" + zipCode + ".json";
     requestYesterday.body = "";
 
     http_response_t http_response;
@@ -58,7 +58,7 @@ weather_yesterday_response_t WeatherUnderground::getYesterday() {
 weather_forecast_response_t WeatherUnderground::getForecast() {
     requestForecast.hostname = "api.wunderground.com";
     requestForecast.port = 80;
-    requestForecast.path = "api/" + WUNDERGRND_KEY + "/yesterday/q/" + zipCode + ".json";
+    requestForecast.path = "/api/" + WUNDERGRND_KEY + "/forecast/q/" + zipCode + ".json";
     requestForecast.body = "";
 
     http_response_t http_response;
