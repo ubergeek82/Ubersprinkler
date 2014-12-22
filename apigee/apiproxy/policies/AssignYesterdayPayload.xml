@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage async="false" continueOnError="false" enabled="true" name="AssignYesterdayPayload">
+    <DisplayName>AssignYesterdayPayload</DisplayName>
+    <FaultRules/>
+    <Properties/>
+	<Set>
+		<Payload contentType="text/json" variablePrefix="#" variableSuffix="%">
+        {
+          "yesterday": 
+            {
+              "date": "#yesterdayResponse.date%",
+              "rain": "#yesterdayResponse.rain%",
+              "precipm": "#yesterdayResponse.precipm%",
+              "precipi": "#yesterdayResponse.precipi%"
+            }
+         }
+      </Payload>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

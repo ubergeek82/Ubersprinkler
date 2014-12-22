@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtractVariables async="false" continueOnError="false" enabled="true" name="Extract-Forecast-Response">
+    <DisplayName>Extract Forecast Response</DisplayName>
+    <FaultRules/>
+    <Properties/>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <JSONPayload>
+      	<!-- Tomorrow -->  
+      	<Variable name="today_dayOfTheWeek">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].date.weekday</JSONPath>
+        </Variable>
+        <Variable name="today_monthName">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].date.monthname</JSONPath>
+        </Variable>
+        <Variable name="today_day">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].date.day</JSONPath>
+        </Variable>
+        <Variable name="today_year">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].date.year</JSONPath>
+        </Variable>
+        <Variable name="today_qpf_in">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].qpf_allday.in</JSONPath>
+        </Variable>
+        <Variable name="today_qpf_mm">
+            <JSONPath>$.forecast.simpleforecast.forecastday[0].qpf_allday.mm</JSONPath>
+        </Variable>
+      	<!-- Tomorrow -->
+      	<Variable name="tomorrow_dayOfTheWeek">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].date.weekday</JSONPath>
+        </Variable>
+        <Variable name="tomorrow_monthName">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].date.monthname</JSONPath>
+        </Variable>
+        <Variable name="tomorrow_day">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].date.day</JSONPath>
+        </Variable>
+        <Variable name="tomorrow_year">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].date.year</JSONPath>
+        </Variable>
+        <Variable name="tomorrow_qpf_in">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].qpf_allday.in</JSONPath>
+        </Variable>
+        <Variable name="tomorrow_qpf_mm">
+            <JSONPath>$.forecast.simpleforecast.forecastday[1].qpf_allday.mm</JSONPath>
+        </Variable>
+    </JSONPayload>
+    <Source clearPayload="false">response</Source>
+    <VariablePrefix>forecastResponse</VariablePrefix>
+</ExtractVariables>

@@ -6,6 +6,13 @@
 
 #define MIN_RAINFALL_MM 4
 
+http_header_t http_headers[] = {
+    //{ "Content-Type", "application/json" },
+    { "Accept" , "application/json" },
+    { "AppKey" , APIGEE_KEY},
+    { NULL, NULL } // NOTE: Always terminate headers will NULL
+};
+
 WeatherUnderground::WeatherUnderground(HttpClient httpClient, int zipParam){
     client = httpClient;
     zipCode = zipParam;
@@ -35,34 +42,36 @@ bool WeatherUnderground::update(){
     }else{
         rainTomorrow = false;
     }
+
+    return false;
 }
 
 weather_yesterday_response_t WeatherUnderground::getYesterday() {
-    requestYesterday.hostname = "api.wunderground.com";
+    requestYesterday.hostname = "ubergeek-prod.apigee.net";
     requestYesterday.port = 80;
-    requestYesterday.path = "/api/" + WUNDERGRND_KEY + "/yesterday/q/" + zipCode + ".json";
+    requestYesterday.path = "/weatherunderground/yesterday/q/" + String(zipCode) + ".json";
     requestYesterday.body = "";
 
     http_response_t http_response;
-    client.get(requestYesterday, http_response);
+
+    client.get(requestYesterday, http_response, http_headers);
     if (http_response.status == 200) {
         return parseYesterday(http_response.body);
     } else {
         Serial.println("weather requestYesterday failed");
         Serial.println(http_response.body);
     }
-
-
 }
 
 weather_forecast_response_t WeatherUnderground::getForecast() {
-    requestForecast.hostname = "api.wunderground.com";
+    requestForecast.hostname = "ubergeek-prod.apigee.net";
     requestForecast.port = 80;
-    requestForecast.path = "/api/" + WUNDERGRND_KEY + "/forecast/q/" + zipCode + ".json";
+    requestForecast.path = "/weatherunderground/forecast/q/" + String(zipCode) + ".json";
     requestForecast.body = "";
 
     http_response_t http_response;
-    client.get(requestForecast, http_response);
+
+    client.get(requestForecast, http_response, http_headers);
     if (http_response.status == 200) {
         return parseForecast(http_response.body);
     } else {

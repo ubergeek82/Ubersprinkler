@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage async="false" continueOnError="false" enabled="true" name="AssignForecastPayload">
+    <DisplayName>AssignForecastPayload</DisplayName>
+    <FaultRules/>
+    <Properties/>
+    <Set>
+		<Payload contentType="text/json" variablePrefix="#" variableSuffix="%">
+        {
+          "forecast":
+            {
+              "today": {
+                "dayOfTheWeek": "#forecastResponse.today_dayOfTheWeek%",
+                "month": "#forecastResponse.today_monthName%",
+                "day": "#forecastResponse.today_day%",
+                "year": "#forecastResponse.today_year%",
+                "qpf_allday_in": "#forecastResponse.today_qpf_in%",
+                "qpf_allday_mm": "#forecastResponse.today_qpf_mm%"
+              },
+              "tomorrow": {
+                "dayOfTheWeek": "#forecastResponse.tomorrow_dayOfTheWeek%",
+                "month": "#forecastResponse.tomorrow_monthName%",
+                "day": "#forecastResponse.tomorrow_day%",
+                "year": "#forecastResponse.tomorrow_year%",
+                "qpf_allday_in": "#forecastResponse.tomorrow_qpf_in%",
+                "qpf_allday_mm": "#forecastResponse.tomorrow_qpf_mm%"
+              }
+            }
+         }
+      </Payload>
+    </Set>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

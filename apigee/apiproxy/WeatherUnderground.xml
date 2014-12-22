@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy revision="4" name="WeatherUnderground">
+    <ConfigurationVersion majorVersion="4" minorVersion="0"/>
+    <CreatedAt>1419148078495</CreatedAt>
+    <CreatedBy>brian.m.ikei@accenture.com</CreatedBy>
+    <Description></Description>
+    <DisplayName>WeatherUnderground</DisplayName>
+    <LastModifiedAt>1419150645371</LastModifiedAt>
+    <LastModifiedBy>brian.m.ikei@accenture.com</LastModifiedBy>
+    <Policies>
+        <Policy>AssignForecastPayload</Policy>
+        <Policy>AssignYesterdayPayload</Policy>
+        <Policy>Extract-Forecast-Response</Policy>
+        <Policy>Extract-Yesterday-Response</Policy>
+        <Policy>QuotaPerDay</Policy>
+        <Policy>QuotaPerMin</Policy>
+        <Policy>Verify-API-Key</Policy>
+    </Policies>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+    </ProxyEndpoints>
+    <Resources/>
+    <TargetServers/>
+    <TargetEndpoints>
+        <TargetEndpoint>default</TargetEndpoint>
+    </TargetEndpoints>
+    <validate>false</validate>
+</APIProxy>

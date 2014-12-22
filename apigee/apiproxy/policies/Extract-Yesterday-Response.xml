@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtractVariables async="false" continueOnError="false" enabled="true" name="Extract-Yesterday-Response">
+    <DisplayName>Extract Yesterday Response</DisplayName>
+    <FaultRules/>
+    <Properties/>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+    <JSONPayload>
+		<Variable name="date">
+            <JSONPath>$.history.date.pretty</JSONPath>
+        </Variable>
+        <Variable name="rain">
+            <JSONPath>$.history.dailysummary[0].rain</JSONPath>
+        </Variable>
+      	<Variable name="precipm">
+            <JSONPath>$.history.dailysummary[0].precipm</JSONPath>
+        </Variable>
+      	<Variable name="precipi">
+            <JSONPath>$.history.dailysummary[0].precipi</JSONPath>
+        </Variable>
+    </JSONPayload>
+    <Source clearPayload="false">response</Source>
+    <VariablePrefix>yesterdayResponse</VariablePrefix>
+</ExtractVariables>
