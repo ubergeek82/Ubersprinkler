@@ -22,8 +22,6 @@ const uint8_t STATION2=D1;
 const uint8_t STATION3=D3;
 const uint8_t STATION4=D4;
 
-const bool debug = true;
-
 SYSTEM_MODE(AUTOMATIC);
 
 
@@ -45,8 +43,7 @@ public:
 RunBeforeSetup runBeforeSetup;
 
 StationController station(STATION1, STATION2, STATION3, STATION4);
-HttpClient httpClient;
-WeatherUnderground weather(httpClient, ZIPCODE);
+WeatherUnderground weather;
 
 int ALARM_CYCLE_TIME = 600;
 char compiledDateTime[22] = COMPILED_DATE;
@@ -59,10 +56,9 @@ uint8_t isRunning = false;
 unsigned long int runTimer;
 
 void setup() {
-    if(debug){
-        Serial.begin(9600);
-    }
-	
+    Serial.begin(9600);
+    delay(5000); //wait for computer to recognize usb device and open serial port
+
 	Serial.println("Setting up UberCore");
 	syncTime();
     strcat(compiledDateTime, " - ");
@@ -90,17 +86,18 @@ void setup() {
     Alarm.alarmRepeat(dowSaturday,7,00,00,cycleAlarm);
 
     cancelCycle();
-
-
-
 }
 
 void loop() {
+	//check connection to cloud
+	if(!Spark.connected()){
+		Spark.connect();
+	}
+	
     stationStatus=station.getStatus();
     Serial.println("stationStatus = " + String(stationStatus));
     signalStrength = WiFi.RSSI();
     Serial.println(Time.timeStr());
-   
 	if(isRunning){
 		Serial.println("isRunning! time left = " + (String(runTimer-Time.now())));
 		if(Time.now() > runTimer){
@@ -167,12 +164,14 @@ int setAlarmTime(String arg){
 
 int checkWeather(String arg){
 	//check weather api for yesterday, today, and tomorrow
-	if(weather.update()){
+	int zipCode = arg.toInt();
+	if(weather.update(zipCode)){
 		Serial.println("Weather Updated Successfully");
+		return 1;
 	}else{
 		Serial.println("Weather update failed!");
+		return 0;
 	}
-	return 1;
 }
 
 void startCycle(int cycleTimeSec){

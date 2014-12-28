@@ -7,7 +7,7 @@
 class WeatherController{
  
  public:
-    bool update();
+    bool update(int zipParam);
     bool wasRainYesterday();
     bool willRainToday();
     bool willRainTomorrow();
@@ -15,7 +15,6 @@ class WeatherController{
   protected:
   	http_request_t requestYesterday;
     http_request_t requestForecast;
-    HttpClient client;
   	int zipCode;
   	bool rainedYesterday;
   	bool rainToday;

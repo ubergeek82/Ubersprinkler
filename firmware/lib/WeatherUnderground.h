@@ -16,27 +16,27 @@ typedef struct weather_yesterday_response_t {
 } weather_yesterday_response_t;
 
 typedef struct weather_forecast_response_t {
-	int qpf_today_mm;
-	int qpf_today_in;
+	int today_mm;
+	int today_in;
 
-	int qpf_tomorrow_mm;
-	int qpf_tomorrow_in;
+	int tomorrow_mm;
+	int tomorrow_in;
 	
 	bool isSuccess;
 	// defaults:
-	weather_forecast_response_t(): qpf_today_mm(-1), qpf_today_in(-1), qpf_tomorrow_mm(-1), qpf_tomorrow_in(-1), isSuccess(false) {};
+	weather_forecast_response_t(): today_mm(-1), today_in(-1), tomorrow_mm(-1), tomorrow_in(-1), isSuccess(false) {};
 
 } weather_forecast_response_t;
 
 class WeatherUnderground : public WeatherController {
  
 public:
-	WeatherUnderground(HttpClient httpClient, int zipParam);
-	bool update();
+	WeatherUnderground();
+	bool update(int zipParam);
 private:
 	ArduinoJson::Parser::JsonParser<70> parser; // occupies 70 * 4 bytes
-	weather_yesterday_response_t getYesterday(); 
-	weather_forecast_response_t getForecast();
+	weather_yesterday_response_t getYesterday(int zipCode); 
+	weather_forecast_response_t getForecast(int zipCode);
 	weather_yesterday_response_t parseYesterday(String& data);
 	weather_forecast_response_t parseForecast(String& data);
 };
